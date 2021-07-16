@@ -157,20 +157,23 @@ def convert_pd0_to_netcdf(pd0File, cdfFile, good_ens, serial_number, time_type, 
             varobj = cdf.variables['sv']
             varobj[netcdf_index] = ens_data['VLeader']['Speed_of_Sound']
 
-            for i in range(nslantbeams):
-                varname = "vel%d" % (i+1)
-                varobj = cdf.variables[varname]
-                varobj[netcdf_index, :] = ens_data['VData'][i, :]
+            if 'VData' in ens_data:
+                for i in range(nslantbeams):
+                    varname = "vel%d" % (i+1)
+                    varobj = cdf.variables[varname]
+                    varobj[netcdf_index, :] = ens_data['VData'][i, :]
 
-            for i in range(nslantbeams):
-                varname = "cor%d" % (i+1)
-                varobj = cdf.variables[varname]
-                varobj[netcdf_index, :] = ens_data['CData'][i, :]
+            if 'CData' in ens_data:
+                for i in range(nslantbeams):
+                    varname = "cor%d" % (i+1)
+                    varobj = cdf.variables[varname]
+                    varobj[netcdf_index, :] = ens_data['CData'][i, :]
 
-            for i in range(nslantbeams):
-                varname = "att%d" % (i+1)
-                varobj = cdf.variables[varname]
-                varobj[netcdf_index, :] = ens_data['IData'][i, :]
+            if 'IData' in ens_data:
+                for i in range(nslantbeams):
+                    varname = "att%d" % (i+1)
+                    varobj = cdf.variables[varname]
+                    varobj[netcdf_index, :] = ens_data['IData'][i, :]
 
             if 'GData' in ens_data:
                 for i in range(nslantbeams):
@@ -389,7 +392,7 @@ def write_dict_to_cdf_attributes(netcdf_object, d, tag):
             try:
                 d[key] = float(d[key])
             except ValueError:
-                # we really don't need to print here, 
+                # we really don't need to print here,
                 # but python insists we do something
                 # print('   can\'t convert %s to float' % key)
                 i += 1
@@ -540,7 +543,7 @@ def setup_netcdf_file(fname, ens_data, gens, serial_number, time_type, delta_t):
     :param str delta_t: time between ensembles
     :return: netcdf file object, string describing the time units for CF time
     """
-    # note that 
+    # note that
     # f4 = 4 byte, 32 bit float
     # maxfloat = 3.402823*10**38;
     # where the variable is based ona  single dimension, usually time, it is still expressed as a tuple ("time") and
@@ -581,7 +584,7 @@ def setup_netcdf_file(fname, ens_data, gens, serial_number, time_type, delta_t):
     # the ensemble number is a two byte LSB and a one byte MSB (for the rollover)
     # varobj.valid_range = [0, 2**23]
 
-    # it's not yet clear which way to go with this.  python tools like xarray 
+    # it's not yet clear which way to go with this.  python tools like xarray
     # and panoply demand that time be a CF defined time.
     # USGS CMG MATLAB tools need time and time2
     # TODO - CF_time can come out as YYYY-M-D for dates with single digit months and days, check to see if this is ISO
@@ -1040,7 +1043,7 @@ def setup_netcdf_file(fname, ens_data, gens, serial_number, time_type, delta_t):
 def bitstrLE(byte):
     """
     make a bit string from little endian byte
-    
+
     :param byte byte: a byte
     :return: a string of ones and zeros, the bits in the byte
     """
@@ -1361,22 +1364,22 @@ def parse_TRDI_variable_leader(bstream, offset):
     v_leader_data['H/Hdg_Std_Dev'] = bstream[offset+31]
     v_leader_data['P/Pitch_Std_Dev'] = bstream[offset+32]
     v_leader_data['R/Roll_Std_Dev'] = bstream[offset+33]
-    # the V Series PDO Output is different for the ADC channels        
-    # V PD0 this is ADC Channel 0 not used    
+    # the V Series PDO Output is different for the ADC channels
+    # V PD0 this is ADC Channel 0 not used
     v_leader_data['Xmit_Current'] = bstream[offset+34]  # ADC Channel 0
-    # V PD0 this is ADC Channel 1 XMIT Voltage    
+    # V PD0 this is ADC Channel 1 XMIT Voltage
     v_leader_data['Xmit_Voltage'] = bstream[offset+35]  # ADC Channel 1
-    # V PD0 this is ADC Channel 2 not used    
+    # V PD0 this is ADC Channel 2 not used
     v_leader_data['Ambient_Temp'] = bstream[offset+36]  # ADC Channel 2
-    # V PD0 this is ADC Channel 3 not used    
+    # V PD0 this is ADC Channel 3 not used
     v_leader_data['Pressure_(+)'] = bstream[offset+37]  # ADC Channel 3
-    # V PD0 this is ADC Channel 4 not used    
+    # V PD0 this is ADC Channel 4 not used
     v_leader_data['Pressure_(-)'] = bstream[offset+38]  # ADC Channel 4
-    # V PD0 this is ADC Channel 5 not used    
+    # V PD0 this is ADC Channel 5 not used
     v_leader_data['Attitude_Temp'] = bstream[offset+39]  # ADC Channel 5
-    # V PD0 this is ADC Channel 6 not used    
+    # V PD0 this is ADC Channel 6 not used
     v_leader_data['Attitude'] = bstream[offset+40]  # ADC Channel 6
-    # V PD0 this is ADC Channel 7 not used    
+    # V PD0 this is ADC Channel 7 not used
     v_leader_data['Contamination_Sensor'] = bstream[offset+41]  # ADC Channel 7
 
     v_leader_data['Error_Status_Word_Low_16_bits_LSB'] = bitstrLE(bstream[offset+42])
@@ -1949,7 +1952,7 @@ def julian(year, month, day, hour, mn, sec, hund):
     j = math.floor((146097*c)/4)+math.floor((1461*yr)/4) + \
         math.floor((153*mo + 2)/5)+d+1721119
 
-    # If you want julian days to start and end at noon, 
+    # If you want julian days to start and end at noon,
     # replace the following line with:
     # j=j+(decimalhrs-12)/24;
     j = j+decimalhrs/24
@@ -1998,7 +2001,7 @@ def analyzepd0file(pd0file, verbose=False):
     print(header)
     # it is faster to define the netCDF file with a known length
     # for this we need to estimate how many ensembles we will be reading
-    # for some reason, sys.getsizeof(infile) does not report the true length 
+    # for some reason, sys.getsizeof(infile) does not report the true length
     # of the input file, so we will go to the end and see how far we have gone
     # there is a problem though.  While TRDI's documentation says the V Series
     # System Configuration data is always sent, this is not the case, so reading
