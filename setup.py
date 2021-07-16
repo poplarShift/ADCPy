@@ -8,13 +8,13 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='ADCPy',
-    version='0.1.1',
-    author='Marinna Martini',
+    version='0.1.2',
+    author='Marinna Martini [forked by Achim Randelhoff]',
     author_email='mmartini@usgs.gov',
     description='read ADCP data from TRDI and Nortek instruments',
     long_description=long_description, # read from README.md above
     long_description_content_type='text/markdown',
-    url='https://github.com/mmartini-usgs/ADCPy',
+    url='https://github.com/poplarShift/ADCPy',
     packages=setuptools.find_packages(exclude=('tests', 'docs')),
     classifiers=['Programming Language :: Python :: 3',
                  'License :: Public Domain',
