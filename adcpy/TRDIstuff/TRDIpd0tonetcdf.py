@@ -575,6 +575,9 @@ def setup_netcdf_file(fname, ens_data, gens, serial_number, time_type, delta_t):
     cdf.serial_number = serial_number
     cdf.DELTA_T = delta_t
     cdf.sample_rate = ens_data['FLeader']['Time_Between_Ping Groups']
+    cdf.first_ensemble_timestamp = ens_data['VLeader']['dtobj'].strftime(
+        "%Y-%m-%dT%H:%M:%S"
+    )
 
     write_dict_to_cdf_attributes(cdf, ens_data['FLeader'], "TRDI_")
 
